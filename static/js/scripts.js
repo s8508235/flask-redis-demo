@@ -34,10 +34,9 @@ function handleClick() {
     }
     fetch('/query', {
         body: formData,
-        headers: {
-            "Accept": "application/json",
-            "Access-Control-Allow-Origin": "*"
-        },
+        headers: new Headers({
+            'Accept': 'application/json'
+        }),
         mode: 'cors',
         method: "POST",
         referrer: 'no-referrer'
@@ -47,7 +46,7 @@ function handleClick() {
             const localImagePath = "static/img";
             const findItemsAdvancedResponse = data.findItemsAdvancedResponse[0];
             const searchResult = findItemsAdvancedResponse.searchResult[0];
-            console.log(findItemsAdvancedResponse);
+            // console.log(findItemsAdvancedResponse);
             const content = document.getElementById('content');
             // clear previous
             while (content.firstChild) {
@@ -74,6 +73,8 @@ function handleClick() {
                 if (cnt > 10) {
                     break
                 }
+                const imgContainer = document.createElement('div');
+                imgContainer.classList.add('item-img-container');
                 const img = document.createElement('img');
                 // console.log(item.galleryURL);
                 if (item.galleryURL.length > 0) {
@@ -81,67 +82,116 @@ function handleClick() {
                 } else {
                     img.alt = item.title;
                 }
-                cnt += 1;
+                imgContainer.appendChild(img);
 
-                const link = document.createElement('a');
-                link.classList.add('item-link');
+
+                const textContainer = document.createElement('div');
+                textContainer.classList.add('item-text-container');
+
+                const title = document.createElement('a');
+                title.rel = "nofollow";
+                title.target = "_blank"
+                title.classList.add('item-title');
                 // console.log(item.viewItemURL);
-                if (item.viewItemURL.length > 0) {
-                    link.href = item.viewItemURL[0];
+                if (item?.viewItemURL.length > 0) {
+                    title.href = item.viewItemURL[0];
                 } else {
-                    link.href = '';
+                    title.href = '';
                 }
                 if (item.title.length > 0) {
-                    link.textContent = item.title[0];
+                    title.textContent = item.title[0];
                 } else {
-                    link.textContent = '!!!!!!!!!!!No title!!!!!!!!!!!!!!';
+                    title.textContent = '!!!!!!!!!!!No title!!!!!!!!!!!!!!';
                 }
 
                 const category = document.createElement('div');
                 category.classList.add('item-category');
-                if (item.primaryCategory.length > 0) {
+                if (item?.primaryCategory.length > 0) {
                     if (item.primaryCategory[0]["categoryName"].length > 0) {
-                        category.textContent = item.primaryCategory[0]["categoryName"][0];
+                        const categorySpan = document.createElement('span');
+                        categorySpan.textContent = `Category: ${item.primaryCategory[0]["categoryName"][0]}`;
+                        category.appendChild(categorySpan);
+                        {
+                            const categoryAnchor = document.createElement('img');
+                            categoryAnchor.classList.add('item-category-img');
+                            categoryAnchor.src = `${localImagePath}/redirect.png`;
+                            categoryAnchor.alt = 'top-rated';
+                            category.appendChild(categoryAnchor);
+                        }
                     } else {
-                        category.textContent = '';
+                        category.classList.add('display-none');
                     }
                 } else {
-                    category.textContent = '';
+                    category.classList.add('display-none');
                 }
 
-                {
-
-                    const categoryAnchor = document.createElement('img');
-                    categoryAnchor.src = `${localImagePath}/redirect.png`;
-                    categoryAnchor.alt = 'top rated';
-                    // categoryAnchor.textContent = 
-                    category.appendChild(categoryAnchor);
-                }
 
                 const condition = document.createElement('div');
                 condition.classList.add('item-condition');
-                if (item.condition && item.condition.length > 0) {
+                if (item?.condition?.length > 0) {
                     if (item.condition[0]["conditionDisplayName"].length > 0) {
-                        condition.textContent = item.condition[0]["conditionDisplayName"][0];
+                        condition.textContent = `Condition: ${item.condition[0]["conditionDisplayName"][0]}`;
+                        {
+                            if (item.topRatedListing[0] === 'true') {
+                                const topRated = document.createElement('img');
+                                topRated.classList.add('item-top-rated-img');
+                                topRated.src = `${localImagePath}/topRatedImage.png`;
+                                condition.appendChild(topRated);
+                            }
+                        }
                     } else {
-                        condition.textContent = '';
+                        condition.classList.add('display-none');
                     }
                 } else {
-                    condition.textContent = '';
-                }
-                {
-                    if (item.topRatedListing.length > 0) {
-                        if (item.topRatedListing[0]) {
-                            const topRated = document.createElement('img');
-                            topRated.src = `${localImagePath}/topRatedImage.png`;
-                        }
-                    }
+                    condition.classList.add('display-none');
                 }
 
-                itemDiv.appendChild(img);
-                itemDiv.appendChild(link);
-                itemDiv.appendChild(category);
-                itemDiv.appendChild(condition);
+                const seller = document.createElement('div');
+                seller.classList.add('item-seller');
+                if (item?.returnsAccepted?.length > 0) {
+                    const sellerText = item.returnsAccepted[0] === 'true' ? 'does not' : 'accepts';
+                    seller.textContent = `Seller ${sellerText} returns`;
+                } else {
+                    seller.classList.add('display-none');
+                }
+
+                const shipping = document.createElement('div');
+                const shippingCost = item?.shippingInfo?.length > 0 &&  item?.shippingInfo[0]?.shippingServiceCost?.length > 0?  parseFloat(item.shippingInfo[0].shippingServiceCost[0]["__value__"]) : -1;
+                console.log(shippingCost);
+                shipping.classList.add('item-shipping');
+                if (item?.returnsAccepted?.length > 0) {
+                    const freeText = shippingCost === 0 ? 'Free Shipping' : 'No Free Shipping';
+                    shipping.textContent = `${freeText} ${item.shippingInfo[0]['expeditedShipping'][0] === 'true' ? '-- Expedited Shipping available' : ''}`;
+                } else {
+                    shipping.classList.add('display-none');
+                }
+
+                const price = document.createElement('div');
+                price.classList.add('item-condition');
+                if (item.sellingStatus && item.sellingStatus.length > 0) {
+                    if (item.sellingStatus[0]["convertedCurrentPrice"].length > 0) {
+                        let priceText = `Price: $${item.sellingStatus[0]["convertedCurrentPrice"][0]["__value__"]}`;
+                        if (shippingCost > 0) {
+                            priceText = `${priceText} (+ $${shippingCost} for shipping)`
+                        }
+                        price.textContent = priceText;
+                    } else {
+                        price.classList.add('display-none');
+
+                    }
+                } else {
+                    price.classList.add('display-none');
+                }
+
+                itemDiv.appendChild(imgContainer);
+                textContainer.appendChild(title);
+                textContainer.appendChild(category);
+                textContainer.appendChild(condition);
+                textContainer.appendChild(seller);
+                textContainer.appendChild(shipping);
+                textContainer.appendChild(price);
+                itemDiv.appendChild(textContainer);
+                cnt += 1;
                 itemListContainer.appendChild(itemDiv);
             }
             content.appendChild(itemListContainer);

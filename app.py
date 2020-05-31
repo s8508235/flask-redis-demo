@@ -19,16 +19,15 @@ def hello_ebay():
 @app.route('/query', methods=["POST"])
 def show_result():
     if request.method == 'POST':
-        # print(request.form)
         req_obj = {"OPERATION-NAME": "findItemsAdvanced",
                    "SERVICE-VERSION": "1.0.0", "SECURITY-APPNAME": os.getenv("API_KEY"), "RESPONSE-DATA-FORMAT": "JSON"}
 
         req_obj.update({"keywords": (request.form.get(
             "keywords")), "sortOrder": enum.sortbyText(int(request.form.get("sortby")))})
         # r = get('https://svcs.ebay.com/services/search/FindingService/v1', params = req_obj)
-        # p = Request(
-        #     'GET', 'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj).prepare()
-        # print(p.url)
+        p = Request(
+            'GET', 'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj).prepare()
+        print(p.url)
         # print(r.text[:1000])
         # print(req_obj)
         # json_text = json.loads(r.text)
