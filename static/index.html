@@ -1,0 +1,85 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Ebay Template</title>
+    <meta name="description" content="Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+    <meta name="author" content="Bill">
+
+    <link rel="stylesheet" href="static/css/styles.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <img src="static/img/eBayLogo.png" alt="eBayLogo">
+            <h1>Shopping</h1>
+        </header>
+        <form id="myForm">
+            <table>
+                <tr>
+                    <td>
+                        <span class="required-label field-label">Key Words</span><span class="field-label">:</span>
+                        <input class="required-field" type="text" required name="keywords"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="field-label">Price Range</span><span class="field-label">:</span>
+                        From&nbsp;<input type="number" name="minimumprice" id="minimumPrice">&nbsp;to&nbsp;
+                        <input type="number" min="0.0" name="maximumprice" id="maximumPrice">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="field-label">Condition</span><span class="field-label">:</span>
+                        <input type="checkbox" name="new"> New <input type="checkbox" name="used"> Used
+                        <input type="checkbox" name="verygood"> Very Good
+                        <input type="checkbox" name="good"> Good <input type="checkbox" name="acceptable"> Acceptable
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="field-label">Seller</span><span class="field-label">:</span>
+                        <input type="checkbox" name="returnacceptable"> Return Accepted
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="field-label">Shipping</span><span class="field-label">:</span>
+                        <input type="checkbox" name="free"> Free <input type="checkbox" name="expedited"> Expedited
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <span class="field-label">Sort by</span><span class="field-label">:</span>
+                        <select id="sort-selection" name="sortby">
+                            <option value="0">Best Match</option>
+                            <option value="1">Price:highest first</option>
+                            <option value="2">Price + Shipping: highest first</option>
+                            <option value="3">Price + Shipping: lowest first</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="reset" value="Clear">
+                        <button onclick="handleClick()">Search</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+        <div id="content">
+
+        </div>
+    </div>
+    <script src="static/js/scripts.js"></script>
+</body>
+
+</html>
