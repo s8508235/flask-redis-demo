@@ -24,6 +24,7 @@ function validatePriceRange() {
         return ValidEnum.MinLargerThanMax;
     }
 }
+var showMoreStatus = false;
 
 function handleClick() {
     const formData = new FormData(document.getElementById('myForm'));
@@ -38,6 +39,7 @@ function handleClick() {
             alert('Price Range values cannot be negative! Please try a value greater than or equal to 0.0')
             return false;
     }
+    showMoreStatus = false;
     fetch('/query', {
         body: formData,
         headers: new Headers({
@@ -93,11 +95,11 @@ function handleClick() {
                 if (!showMoreStatus) {
                     listItemContainer.classList.add('show-more');
                     this.textContent = 'Show Less';
-                    showMoreStatus = !showMoreStatus;
                 } else {
                     listItemContainer.classList.remove('show-more');
                     this.textContent = 'Show More';
                 }
+                showMoreStatus = !showMoreStatus;
             })
             showButton.textContent = 'Show More';
             buttonDiv.appendChild(showButton)
@@ -273,4 +275,3 @@ function handleClick() {
             })
         })
 }
-var showMoreStatus = false;
