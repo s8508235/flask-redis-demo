@@ -25,14 +25,14 @@ table, th, td {
     border-collapse: collapse;
 }
 table tr td{
-    min-width: 1000px;
+    min-width: 600px;
     height: 40px;
     text-align: center;
 }
 .field-label {
     font-weight: bold;
 }
-.required-label:after {
+.required-label::after {
     content:"*";
     color: red;
 }
@@ -52,23 +52,40 @@ input.black-border:invalid {
     flex-direction: row;
 }
 
-h2 {
+h2.query-header {
+    text-align: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid lightgray;
+}
+h2.no-found-header {
+    padding: 12px 0;
     text-align: center;
 }
-
 .item-container + .item-container {
     margin-top: 4px;
 }
-
 .item-category, .item-condition {
     display: flex;
     flex-direction: row;
     height: 16px;
 }
 
+.item-category-span::after,.item-condition-span::after {
+    content: '\00a0';
+}
+
 .item-category-img, .item-top-rated-img {
     object-fit: contain;
     height: 100%;
+}
+
+.item-price {
+    display: flex;
+    flex-direction: row;
+}
+
+.item-price-content + .item-ship-from {
+    padding-left: 4px;
 }
 
 .item-img-container {
@@ -87,10 +104,19 @@ h2 {
 }
 
 .item-text-container {
+    position: relative;
     flex: 6;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+}
+
+.item-text-container .item-shipping , .item-text-container .item-seller, .item-text-container .item-price .item-ship-from, .item-text-container .cancel-button {
+    display: none;
+}
+
+.item-text-container.clicked .item-shipping , .item-text-container.clicked .item-seller, .item-text-container.clicked .item-price .item-ship-from, .item-text-container.clicked .cancel-button {
+    display: block;
 }
 
 .display-none {
@@ -98,6 +124,31 @@ h2 {
 }
 
 .item-title {
+    width: fit-content;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.cancel-button:after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    content: "\274c";
+    font-size: 20px; 
+    color: #FFF;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.item-list-container .item-container.item-more{
+    display:none;
+}
+.item-list-container.show-more .item-container.item-more{
+    display:block;
+}
+
+.item-button-div {
+    text-align: center;
 }

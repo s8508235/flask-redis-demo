@@ -5,7 +5,7 @@ import urllib
 from requests import Request, get
 import os
 import json
-from util import enum, filter
+from util import query_param
 load_dotenv()
 
 app = Flask(__name__)
@@ -19,20 +19,23 @@ def hello_ebay():
 @app.route('/query', methods=["POST"])
 def show_result():
     if request.method == 'POST':
+
         req_obj = {"OPERATION-NAME": "findItemsAdvanced",
                    "SERVICE-VERSION": "1.0.0", "SECURITY-APPNAME": os.getenv("API_KEY"), "RESPONSE-DATA-FORMAT": "JSON"}
+        parsed = query_param.parse(request.form.copy())
+        req_obj.update(parsed)
 
-        req_obj.update({"keywords": (request.form.get(
-            "keywords")), "sortOrder": enum.sortbyText(int(request.form.get("sortby")))})
-        # r = get('https://svcs.ebay.com/services/search/FindingService/v1', params = req_obj)
-        p = Request(
-            'GET', 'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj).prepare()
-        print(p.url)
+        r = get(
+            'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj)
+        # p = Request(
+        #     'GET', 'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj).prepare()
+        # print(p.url)
         # print(r.text[:1000])
         # print(req_obj)
-        # json_text = json.loads(r.text)
-        with open('harry_porter.json', "r", encoding="utf-8") as json_file:
-            json_text = json.load(json_file)
+        json_text = json.loads(r.text)
+        # print(r.url)
+        # with open('harry_porter.json', "r", encoding="utf-8") as json_file:
+        #     json_text = json.load(json_file)
         json_text["request"] = request.form.get("keywords")
         print(json_text["findItemsAdvancedResponse"][0]["ack"])
         return jsonify(json_text)

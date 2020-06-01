@@ -6,8 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const ValidEnum = Object.freeze({ "Success": 1, "UnderZero": 2, "MinLargerThanMax": 3 });
 function validatePriceRange() {
-    const minimum = document.getElementById('minimumPrice').value;
-    const maximum = document.getElementById('maximumPrice').value;
+    const minimum = parseFloat(document.getElementById('minimumPrice').value);
+    const maximum = parseFloat(document.getElementById('maximumPrice').value);
+    // console.log(typeof (minimum), typeof (maximum));
+
+    if (isNaN(minimum) || isNaN(maximum)) {
+        return ValidEnum.Success;
+    }
+
     if (minimum < 0 || maximum < 0) {
         return ValidEnum.UnderZero;
     }
@@ -45,6 +51,9 @@ function handleClick() {
         .then((data) => {
             const localImagePath = "static/img";
             const findItemsAdvancedResponse = data.findItemsAdvancedResponse[0];
+            if (!findItemsAdvancedResponse?.ack?.length === 0 || findItemsAdvancedResponse?.ack[0] === 'Failure') {
+                return console.error('Failure Fetch');
+            }
             const searchResult = findItemsAdvancedResponse.searchResult[0];
             // console.log(findItemsAdvancedResponse);
             const content = document.getElementById('content');
@@ -54,7 +63,18 @@ function handleClick() {
             }
             // header
             const header = document.createElement('h2');
-            header.textContent = `${Reflect.get(findItemsAdvancedResponse['paginationOutput'][0], 'totalEntries')} Result found for `;
+            const totalResult = parseFloat(Reflect.get(findItemsAdvancedResponse['paginationOutput'][0], 'totalEntries'));
+            // console.log(totalResult, typeof (totalResult));
+            if (totalResult === 0) {
+                header.classList.add('no-found-header');
+                header.textContent = `No Result found`;
+                content.appendChild(header);
+                content.appendChild(itemListContainer);
+                return;
+            } else {
+                header.classList.add('query-header');
+                header.textContent = `${totalResult} Result found for `;
+            }
             const italic = document.createElement('i');
             italic.textContent = `${data.request}`;
             header.appendChild(italic);
@@ -64,12 +84,33 @@ function handleClick() {
             const itemListContainer = document.createElement('div');
             itemListContainer.classList.add('item-list-container');
 
+            const buttonDiv = document.createElement('div');
+            buttonDiv.classList.add('item-button-div');
+            const showButton = document.createElement('button');
+            showButton.classList.add('item-show-button');
+            showButton.addEventListener('click', function () {
+                const listItemContainer = document.querySelector('.item-list-container');
+                if (!showMoreStatus) {
+                    listItemContainer.classList.add('show-more');
+                    this.textContent = 'Show Less';
+                    showMoreStatus = !showMoreStatus;
+                } else {
+                    listItemContainer.classList.remove('show-more');
+                    this.textContent = 'Show More';
+                }
+            })
+            showButton.textContent = 'Show More';
+            buttonDiv.appendChild(showButton)
+
             cnt = 0
-            console.log(searchResult);
+            // console.log(searchResult);
             for (const item of Reflect.get(searchResult, 'item')) {
                 // console.log(item);
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('item-container');
+                if (cnt > 3) {
+                    itemDiv.classList.add('item-more');
+                }
                 if (cnt > 10) {
                     break
                 }
@@ -77,7 +118,7 @@ function handleClick() {
                 imgContainer.classList.add('item-img-container');
                 const img = document.createElement('img');
                 // console.log(item.galleryURL);
-                if (item.galleryURL.length > 0) {
+                if (item?.galleryURL?.length > 0) {
                     img.src = item.galleryURL[0];
                 } else {
                     img.alt = item.title;
@@ -93,12 +134,12 @@ function handleClick() {
                 title.target = "_blank"
                 title.classList.add('item-title');
                 // console.log(item.viewItemURL);
-                if (item?.viewItemURL.length > 0) {
+                if (item?.viewItemURL?.length > 0) {
                     title.href = item.viewItemURL[0];
                 } else {
                     title.href = '';
                 }
-                if (item.title.length > 0) {
+                if (item?.title?.length > 0) {
                     title.textContent = item.title[0];
                 } else {
                     title.textContent = '!!!!!!!!!!!No title!!!!!!!!!!!!!!';
@@ -106,9 +147,10 @@ function handleClick() {
 
                 const category = document.createElement('div');
                 category.classList.add('item-category');
-                if (item?.primaryCategory.length > 0) {
+                if (item?.primaryCategory?.length > 0) {
                     if (item.primaryCategory[0]["categoryName"].length > 0) {
                         const categorySpan = document.createElement('span');
+                        categorySpan.classList.add('item-category-span');
                         categorySpan.textContent = `Category: ${item.primaryCategory[0]["categoryName"][0]}`;
                         category.appendChild(categorySpan);
                         {
@@ -130,7 +172,10 @@ function handleClick() {
                 condition.classList.add('item-condition');
                 if (item?.condition?.length > 0) {
                     if (item.condition[0]["conditionDisplayName"].length > 0) {
-                        condition.textContent = `Condition: ${item.condition[0]["conditionDisplayName"][0]}`;
+                        const conditionSpan = document.createElement('span');
+                        conditionSpan.classList.add('item-condition-span');
+                        conditionSpan.textContent = `Condition: ${item.condition[0]["conditionDisplayName"][0]}`;
+                        condition.appendChild(conditionSpan);
                         {
                             if (item.topRatedListing[0] === 'true') {
                                 const topRated = document.createElement('img');
@@ -156,8 +201,8 @@ function handleClick() {
                 }
 
                 const shipping = document.createElement('div');
-                const shippingCost = item?.shippingInfo?.length > 0 &&  item?.shippingInfo[0]?.shippingServiceCost?.length > 0?  parseFloat(item.shippingInfo[0].shippingServiceCost[0]["__value__"]) : -1;
-                console.log(shippingCost);
+                const shippingCost = item?.shippingInfo?.length > 0 && item?.shippingInfo[0]?.shippingServiceCost?.length > 0 ? parseFloat(item.shippingInfo[0].shippingServiceCost[0]["__value__"]) : -1;
+                // console.log(shippingCost);
                 shipping.classList.add('item-shipping');
                 if (item?.returnsAccepted?.length > 0) {
                     const freeText = shippingCost === 0 ? 'Free Shipping' : 'No Free Shipping';
@@ -167,21 +212,32 @@ function handleClick() {
                 }
 
                 const price = document.createElement('div');
-                price.classList.add('item-condition');
-                if (item.sellingStatus && item.sellingStatus.length > 0) {
+                const priceContent = document.createElement('span');
+                priceContent.classList.add('item-price-content');
+                price.classList.add('item-price');
+                if (item?.sellingStatus?.length > 0) {
                     if (item.sellingStatus[0]["convertedCurrentPrice"].length > 0) {
                         let priceText = `Price: $${item.sellingStatus[0]["convertedCurrentPrice"][0]["__value__"]}`;
                         if (shippingCost > 0) {
                             priceText = `${priceText} (+ $${shippingCost} for shipping)`
                         }
-                        price.textContent = priceText;
+                        priceContent.textContent = priceText;
                     } else {
                         price.classList.add('display-none');
-
                     }
                 } else {
                     price.classList.add('display-none');
                 }
+                price.appendChild(priceContent);
+
+                const shipFrom = document.createElement('span');
+                shipFrom.classList.add('item-ship-from');
+                if (item?.location?.length > 0) {
+                    shipFrom.textContent = `from ${item.location[0]}`;
+                } else {
+                    shipFrom.classList.add('display-none');
+                }
+                price.appendChild(shipFrom);
 
                 itemDiv.appendChild(imgContainer);
                 textContainer.appendChild(title);
@@ -191,9 +247,30 @@ function handleClick() {
                 textContainer.appendChild(shipping);
                 textContainer.appendChild(price);
                 itemDiv.appendChild(textContainer);
+
+                const cancelButton = document.createElement('div');
+                cancelButton.classList.add('cancel-button');
+                cancelButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    textContainer.classList.remove('clicked');
+                })
+                textContainer.appendChild(cancelButton);
                 cnt += 1;
                 itemListContainer.appendChild(itemDiv);
+                itemListContainer.appendChild(buttonDiv);
             }
             content.appendChild(itemListContainer);
+        }).then(() => {
+            const textContainers = document.querySelectorAll('.item-text-container');
+            // const sellers = document.querySelectorAll('.item-text-container div.item-seller');
+            // const shippings = document.querySelectorAll('.item-text-container div.item-shipping');
+            textContainers.forEach((textContainer, index) => {
+                textContainer.addEventListener('click', () => {
+                    if (!textContainer.classList.contains('clicked')) {
+                        textContainer.classList.add('clicked');
+                    }
+                })
+            })
         })
 }
+var showMoreStatus = false;
