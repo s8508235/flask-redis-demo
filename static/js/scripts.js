@@ -40,13 +40,16 @@ function handleClick() {
             return false;
     }
     showMoreStatus = false;
-    fetch('/query', {
-        body: formData,
-        headers: new Headers({
-            'Accept': 'application/json'
-        }),
-        mode: 'cors',
-        method: "POST",
+    const url = new URL('http://localhost:5000/query');
+    url.search = new URLSearchParams(formData).toString();
+    // console.log(url.toString());
+    fetch(url.toString(), {
+        // body: formData,
+        // headers: new Headers({
+        //     'Access-Control-Allow-Origin': '*'
+        // }),
+        // mode: 'cors',
+        method: "GET",
         referrer: 'no-referrer'
     })
         .then(data => data.json())
