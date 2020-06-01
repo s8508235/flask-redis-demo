@@ -108,10 +108,10 @@ function handleClick() {
                 // console.log(item);
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('item-container');
-                if (cnt > 3) {
+                if (cnt > 2) {
                     itemDiv.classList.add('item-more');
                 }
-                if (cnt > 10) {
+                if (cnt > 9) {
                     break
                 }
                 const imgContainer = document.createElement('div');
