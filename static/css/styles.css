@@ -146,6 +146,9 @@ h2.no-found-header {
     text-align: center;
     cursor: pointer;
 }
+.item-show-button {
+    margin-top: 12px;
+}
 
 .item-list-container .item-container.item-more{
     display:none;

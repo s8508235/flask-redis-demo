@@ -1,9 +1,15 @@
-from . import query_enum
+def sortbyText(x: int) -> str:
+    return [
+        'BestMatch',
+        'CurrentPriceHighest',
+        'PricePlusShippingHighest',
+        'PricePlusShippingLowest'
+    ][x]
 
 
 def parse(request):
     param_dict = {"keywords": request.pop(
-        "keywords"), "sortOrder": query_enum.sortbyText(int(request.pop("sortby")))}
+        "keywords"), "sortOrder": sortbyText(int(request.pop("sortby")))}
 
     filter_cnt = 0
     filter_list = []
@@ -83,5 +89,4 @@ def parse(request):
                                f"itemFilter({filter_dict.get('index')}).paramValue": "USD"})
 
     param_dict.update(condition_dict)
-    # print(param_dict)
     return param_dict

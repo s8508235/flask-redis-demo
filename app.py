@@ -25,19 +25,9 @@ def show_result():
         parsed = query_param.parse(request.args.copy())
         req_obj.update(parsed)
 
-        # r = get(
-        #     'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj)
-        p = Request(
-            'GET', 'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj).prepare()
-        print(p.url)
-        # print(r.text[:1000])
-        # print(req_obj)
-        # json_text = json.loads(r.text)
-        # print(r.url)
-        with open('harry_porter.json', "r", encoding="utf-8") as json_file:
-            json_text = json.load(json_file)
-        json_text["request"] = request.args.get("keywords")
-        print(json_text["findItemsAdvancedResponse"][0]["ack"])
+        r = get(
+            'https://svcs.ebay.com/services/search/FindingService/v1', params=req_obj)
+        json_text = json.loads(r.text)
         return jsonify(json_text)
 
 
