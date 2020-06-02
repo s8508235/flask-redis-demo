@@ -40,10 +40,8 @@ function handleClick() {
             return false;
     }
     showMoreStatus = false;
-    const url = new URL('http://localhost:5000/query');
-    url.search = new URLSearchParams(formData).toString();
     // console.log(url.toString());
-    fetch(url.toString(), {
+    fetch(`/query?${new URLSearchParams(formData).toString()}`, {
         // body: formData,
         // headers: new Headers({
         //     'Access-Control-Allow-Origin': '*'
