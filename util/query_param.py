@@ -1,3 +1,6 @@
+import re
+
+
 def sortbyText(x: int) -> str:
     return [
         'BestMatch',
@@ -5,6 +8,15 @@ def sortbyText(x: int) -> str:
         'PricePlusShippingHighest',
         'PricePlusShippingLowest'
     ][x]
+
+
+def sortByNum(x: str) -> int:
+    return [
+        'BestMatch',
+        'CurrentPriceHighest',
+        'PricePlusShippingHighest',
+        'PricePlusShippingLowest'
+    ].index(x)
 
 
 def parse(request):
@@ -90,3 +102,65 @@ def parse(request):
 
     param_dict.update(condition_dict)
     return param_dict
+
+
+def encode(queryList):
+    encode_dict_list = []
+    for query in queryList:
+        query_param = dict()
+        defatul_query_param_dict = {}
+        pattern = re.compile("^itemFilter\((\d+)\)\.(.*)$")
+        for key in query.keys():
+            # print(key)
+            result = pattern.search(key)
+            if result is not None:
+                index = result.group(1)
+                prop = result.group(2)
+                # print(index, prop)
+                if index in query_param:
+                    # print("----------------------")
+                    # print(query_param.get(index))
+                    query_param.get(index).update({prop: query.get(key)})
+                else:
+                    query_param.update({index: dict({prop: query.get(key)})})
+            else:
+                if key == 'sortOrder':
+                    defatul_query_param_dict.update(
+                        {'sortby': sortByNum(query.get(key))})
+                else:
+                    defatul_query_param_dict.update({key: query.get(key)})
+        encode_dict = dict()
+        encode_dict.setdefault('minimumprice', '')
+        encode_dict.setdefault('maximumprice', '')
+        for key in query_param.keys():
+            target = query_param.get(key)
+            name = target.get('name')
+            if name != 'Condition':
+                if name == 'MinPrice':
+                    encode_dict.update({'minimumprice': target.get('value')})
+                elif name == 'MaxPrice':
+                    encode_dict.update({'maximumprice': target.get('value')})
+                elif name == 'ReturnsAcceptedOnly':
+                    encode_dict.update({'returnacceptable': 'on'})
+                elif name == 'FreeShippingOnly':
+                    encode_dict.update({'free': 'on'})
+                elif name == 'ExpeditedShippingType':
+                    encode_dict.update({'expedited': 'on'})
+            else:
+                for condition_key in target.keys():
+                    if condition_key != 'name':
+                        value = target.get(condition_key)
+                        if value == '1000':
+                            encode_dict.update({'new': 'on'})
+                        elif value == '3000':
+                            encode_dict.update({'used': 'on'})
+                        elif value == '4000':
+                            encode_dict.update({'verygood': 'on'})
+                        elif value == '5000':
+                            encode_dict.update({'good': 'on'})
+                        elif value == '6000':
+                            encode_dict.update({'acceptable': 'on'})
+
+        encode_dict.update(defatul_query_param_dict)
+        encode_dict_list.append(encode_dict)
+    return encode_dict_list

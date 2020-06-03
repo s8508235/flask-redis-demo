@@ -1,7 +1,105 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('.required-field').addEventListener("focus", () => document.querySelector('.required-field').classList.remove('black-border'));
     document.querySelector('.required-field').classList.add('black-border');
-    document.getElementById('myForm').addEventListener('submit', (event) => event.preventDefault());
+
+    document.getElementById('side-card-content-container').addEventListener('query', async function () {
+        const data = await fetch(`/latest`, {
+            method: "GET",
+            referrer: 'no-referrer'
+        }).then(data => data.json())
+            .catch(err => console.error(err));
+        if (data.length > 0) {
+            while (this.firstChild) {
+                this.firstChild.remove();
+            }
+            document.getElementById('side-card-title').textContent = data.length === 1 ? 'Previous query' : 'Previous queries';
+            const itemUl = document.createElement('ul');
+            itemUl.classList.add('latest-item-ul');
+            for (const item of data.reverse()) {
+                const itemSpan = document.createElement('span');
+                itemSpan.classList.add('latest-item-span');
+                let sortBy;
+                switch (parseInt(item['sortby'])) {
+                    case 0:
+                        sortBy = 'Best Match';
+                        break;
+                    case 1:
+                        sortBy = 'Price:highest first';
+                        break;
+                    case 2:
+                        sortBy = 'Price + Shipping: highest first';
+                        break;
+                    case 3:
+                        sortBy = 'Price + Shipping: lowest first';
+                        break;
+                    default:
+                        sortBy = 'No such sort';
+                        break;
+                }
+                const basicStr = `${item['keywords']} sort by ${sortBy}`;
+                if (Object.keys(item).length > 2) {
+                    const filterList = [];
+                    const { minimumprice, maximumprice, ...restItem } = item;
+                    const minimum = parseFloat(minimumprice);
+                    const maximum = parseFloat(maximumprice);
+
+                    if (!isNaN(minimum) && !isNaN(maximum)) {
+                        filterList.push(`Price Range from ${minimum} to ${maximum}`);
+                    } else if (isNaN(minimum) && !isNaN(maximum)) {
+                        filterList.push(`Maximum Price ${maximum}`);
+                    } else if (!isNaN(minimum) && isNaN(maximum)) {
+                        filterList.push(`Minimum Price ${maximum}`);
+                    }
+                    const shippingList = [];
+                    const conditionList = [];
+                    for (const key of Object.keys(restItem)) {
+                        switch (key) {
+                            case 'returnacceptable':
+                                filterList.push(`Seller Return Accepted`);
+                                break;
+                            case 'free':
+                                shippingList.push('Free');
+                                break;
+                            case 'expedited':
+                                shippingList.push('Expedited');
+                                break;
+                            case 'new':
+                                conditionList.push('New');
+                                break;
+                            case 'used':
+                                conditionList.push('Used');
+                                break;
+                            case 'verygood':
+                                conditionList.push('Very Good');
+                                break;
+                            case 'good':
+                                conditionList.push('Good');
+                                break;
+                            case 'acceptable':
+                                conditionList.push('Acceptable');
+                                break;
+                        }
+                    }
+                    const shippingText = shippingList.length > 0 ? ` , Shipping: ${shippingList.join(' or ')}` : '';
+                    const conditionText = conditionList.length > 0 ? ` , Condition: ${conditionList.join(' or ')}` : '';
+                    itemSpan.textContent = `${basicStr}${shippingList.length > 0 || conditionList.length > 0 ? ' with ' : ''}${filterList.join(', ')}${shippingText}${conditionText}`;
+                } else {
+                    itemSpan.textContent = basicStr;
+                }
+                itemSpan.addEventListener('click', () => fetchData(item));
+                const itemLi = document.createElement('li');
+                itemLi.appendChild(itemSpan);
+                itemLi.classList.add('latest-item-li');
+                itemUl.appendChild(itemLi);
+            }
+            this.appendChild(itemUl);
+        } else {
+            document.getElementById('side-card-title').textContent = 'No previous query';
+        }
+
+    }, false);
+
+    document.getElementById('side-card-content-container').dispatchEvent(new Event('query'));
 });
 
 const ValidEnum = Object.freeze({ "Success": 1, "UnderZero": 2, "MinLargerThanMax": 3 });
@@ -39,9 +137,15 @@ function handleClick() {
             alert('Price Range values cannot be negative! Please try a value greater than or equal to 0.0')
             return false;
     }
+    fetchData(formData);
+}
+
+
+function fetchData(queryParam) {
+
     showMoreStatus = false;
     // console.log(url.toString());
-    fetch(`/query?${new URLSearchParams(formData).toString()}`, {
+    fetch(`/query?${new URLSearchParams(queryParam).toString()}`, {
         // body: formData,
         // headers: new Headers({
         //     'Access-Control-Allow-Origin': '*'
@@ -274,5 +378,7 @@ function handleClick() {
                     }
                 })
             })
+            document.getElementById('side-card-content-container').dispatchEvent(new Event('query'));
         })
+        .catch(err => console.error(err))
 }

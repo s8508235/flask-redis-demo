@@ -160,3 +160,46 @@ h2.no-found-header {
 .item-button-div {
     text-align: center;
 }
+
+.side-card {
+    padding: 16px;
+    position: fixed;
+    right: 100px;
+    top: 150px;
+    width: 300px;
+    height: fit-content;
+    border: 1px solid darkgrey;
+    box-shadow: 1px 1px black;
+}
+
+.latest-item-ul {
+    padding-inline-start: 0px;
+}
+
+.latest-item-li {
+    list-style-type: circle;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    list-style-position: inside;
+}
+
+.latest-item-li:hover {
+    text-overflow: clip;
+    white-space: pre-line;
+    word-break: break-all;
+}
+
+.latest-item-li:not(:last-of-type) {
+    margin-bottom: 8px;
+}
+
+.latest-item-span {     
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+#side-card-title {
+    text-align: center;
+}
