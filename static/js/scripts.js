@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             referrer: 'no-referrer'
         }).then(data => data.json())
             .catch(err => console.error(err));
-        if (data.length > 0) {
+        if (data && data?.length > 0) {
             while (this.firstChild) {
                 this.firstChild.remove();
             }

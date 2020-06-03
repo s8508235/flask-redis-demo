@@ -23,7 +23,7 @@ def index():
 @app.route('/query', methods=["GET"])
 def query_ebay():
     if request.method == 'GET':
-        print(request.args)
+        # print(request.args)
         req_obj = {"OPERATION-NAME": "findItemsAdvanced",
                    "SERVICE-VERSION": "1.0.0", "SECURITY-APPNAME": os.getenv("API_KEY"), "RESPONSE-DATA-FORMAT": "JSON"}
         parsed = query_param.parse(request.args.copy())
@@ -62,5 +62,5 @@ def latest():
 
 
 if __name__ == "__main__":
-    app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run()
+    # app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.run(host="0.0.0.0")

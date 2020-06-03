@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+  ebay-webapp:
+    build: .
+    image: ebay-webapp
+    container_name: ebay-webapp
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:3.2.11
+    container_name: redis
+    command: redis-server --requirepass redispassword

@@ -25,7 +25,7 @@ def parse(request):
 
     filter_cnt = 0
     filter_list = []
-    print(request)
+    # print(request)
     min_price = request.pop("minimumprice")
     try:
         min_price = float(min_price)
