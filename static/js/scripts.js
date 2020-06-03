@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     const shippingText = shippingList.length > 0 ? ` , Shipping: ${shippingList.join(' or ')}` : '';
                     const conditionText = conditionList.length > 0 ? ` , Condition: ${conditionList.join(' or ')}` : '';
-                    itemSpan.textContent = `${basicStr}${shippingList.length > 0 || conditionList.length > 0 ? ' with ' : ''}${filterList.join(', ')}${shippingText}${conditionText}`;
+                    itemSpan.textContent = `${basicStr}${filterList.length > 0 || shippingList.length > 0 || conditionList.length > 0 ? ' with ' : ''}${filterList.join(', ')}${shippingText}${conditionText}`;
                 } else {
                     itemSpan.textContent = basicStr;
                 }
