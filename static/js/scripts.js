@@ -109,10 +109,15 @@ function validatePriceRange() {
     // console.log(typeof (minimum), typeof (maximum));
 
     if (isNaN(minimum) || isNaN(maximum)) {
+        
+        if (minimum < 0 || maximum < 0) {
+            return ValidEnum.UnderZero;
+        }
+
         return ValidEnum.Success;
     }
 
-    if (minimum < 0 || maximum < 0) {
+    if (minimum < 0) {
         return ValidEnum.UnderZero;
     }
 
@@ -157,7 +162,7 @@ function fetchData(queryParam) {
         .then(data => data.json())
         .then((data) => {
             const localImagePath = "static/img";
-            const findItemsAdvancedResponse = data.findItemsAdvancedResponse[0];
+            const findItemsAdvancedResponse = data?.findItemsAdvancedResponse[0];
             if (!findItemsAdvancedResponse?.ack?.length === 0 || findItemsAdvancedResponse?.ack[0] === 'Failure') {
                 return console.error('Failure Fetch');
             }
@@ -176,7 +181,6 @@ function fetchData(queryParam) {
                 header.classList.add('no-found-header');
                 header.textContent = `No Result found`;
                 content.appendChild(header);
-                content.appendChild(itemListContainer);
                 return;
             } else {
                 header.classList.add('query-header');
