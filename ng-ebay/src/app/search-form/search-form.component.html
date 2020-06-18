@@ -1,0 +1,62 @@
+<form [formGroup]="formGroup">
+    <div class="form-input">
+        <label class="required-label">Key words</label>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="keywords" placeholder="Enter keywords" required>
+        </mat-form-field>
+    </div>
+
+    <div class="form-input">
+        <label>Price range</label>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="minimumprice" placeholder="Min Price" type="number">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="maximumprice" placeholder="Max Price" type="number">
+        </mat-form-field>
+    </div>
+
+    <div class="form-input">
+        <label>Condition</label>
+        <mat-checkbox class="checkbox-margin" (change)="onConditionCheckChange('new')"
+            [checked]="conditionSelection.isSelected('new')">New</mat-checkbox>
+        <mat-checkbox class="checkbox-margin" (change)="onConditionCheckChange('used')"
+            [checked]="conditionSelection.isSelected('used')">Used</mat-checkbox>
+        <mat-checkbox class="checkbox-margin" (change)="onConditionCheckChange('verygood')"
+            [checked]="conditionSelection.isSelected('verygood')">Very Good</mat-checkbox>
+        <mat-checkbox class="checkbox-margin" (change)="onConditionCheckChange('good')"
+            [checked]="conditionSelection.isSelected('good')">Good</mat-checkbox>
+        <mat-checkbox class="checkbox-margin" (change)="onConditionCheckChange('acceptable')"
+            [checked]="conditionSelection.isSelected('acceptable')">Acceptable</mat-checkbox>
+    </div>
+
+    <div class="form-input">
+        <label>Seller</label>
+        <mat-checkbox class="checkbox-margin" [(ngModel)]="returnAccepted" [ngModelOptions]="{standalone: true}">Return Accepted</mat-checkbox>
+    </div>
+
+    <div class="form-input">
+        <label>Shipping</label>
+        <mat-checkbox class="checkbox-margin" (change)="onShippingCheckChange('free')" [checked]="shippingSelection.isSelected('free')">Free</mat-checkbox>
+        <mat-checkbox class="checkbox-margin" (change)="onShippingCheckChange('expedited')" [checked]="shippingSelection.isSelected('expedited')">Expedited</mat-checkbox>
+    </div>
+
+    <div class="form-input">
+        <label>Sort Order</label>
+        <mat-form-field appearance="outline">
+            <mat-select formControlName="sortby">
+                <mat-option *ngFor="let order of orders" [value]="order.value">
+                    {{order.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</form>
+<div class="button-area">
+    <button mat-raised-button color="primary" [disabled]="!formGroup.valid" (click)="onSubmitForm()">
+        <mat-icon aria-hidden="false" aria-label="Example search icon">search</mat-icon>Search
+    </button>
+    <button mat-raised-button color="accent" (click)="onResetForm()">
+        <mat-icon aria-hidden="false" aria-label="Example clear_all icon">clear_all</mat-icon>Clear
+    </button>
+</div>

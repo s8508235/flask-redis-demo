@@ -1,0 +1,37 @@
+.form-input {
+    display:flex;
+    align-items: center;
+    label {
+        font-weight: bolder;
+        width: 80px;
+        display: inline-block;
+        margin-right: 12px;
+    }
+    .required-label::after {
+        content:"*";
+        color: red;
+    }
+    mat-form-field {
+        flex: 1;
+    }
+    mat-form-field + mat-form-field {
+        margin-left: 8px;
+    }
+    & + & {
+        margin-top: 8px;
+    }
+    mat-checkbox + mat-checkbox {
+        margin-left: 4px;
+    }
+}
+
+.button-area {
+    float: right;
+    margin-top: 20px;
+    button {
+        width: 100px;
+    }
+    button + button {
+        margin-left: 12px;
+    }
+}

@@ -1,0 +1,9 @@
+<div class="container">
+  <header class="shopping-header">
+    <img src="assets/eBayLogo.png" alt="eBayLogo">
+  </header>
+  <ng-container [formGroup]="formGroup">
+    <app-search-form formControlName="search"></app-search-form>
+  </ng-container>
+</div>
+<button mat-button (click)="onClick()">click me</button>
